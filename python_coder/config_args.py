@@ -11,7 +11,7 @@ File: config_args.py
 Author: mijianhong(mijianhong@baidu.com)
 Date: 2016/07/08 13:53:12
 """
-import ConfigParser
+from configparser import ConfigParser
 import logging
 
 class ConfigArgs(object):
@@ -31,7 +31,7 @@ class ConfigArgs(object):
         """
         load from configurations from conf_file
         """
-        config = ConfigParser.ConfigParser()
+        config = ConfigParser()
         try:
             conf_res = config.read(self.file_path)
         except ConfigParser.MissingSectionHeaderError as e:

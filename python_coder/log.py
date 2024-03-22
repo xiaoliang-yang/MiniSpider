@@ -16,7 +16,7 @@ import logging
 import logging.handlers
 
 def init_log(log_path, level=logging.INFO, when="D", backup=7,
-             format="%(levelname)s: %(asctime)s: %(filename)s:%(lineno)d * %(thread)d %(message)s",
+             format="%(levelname)s: %(asctime)s: %(filename)s:%(lineno)d * %(thread)d %(funcName)s %(message)s",
              datefmt="%m-%d %H:%M:%S"):
     """
     init_log - initialize log module

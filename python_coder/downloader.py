@@ -11,7 +11,9 @@ File: downloader.py
 Author: mijianhong(mijianhong@baidu.com)
 Date: 2016/07/18 20:58:17
 """
-import urllib2
+import urllib
+import urllib.error
+import urllib.request
 import socket
 import logging
 
@@ -40,12 +42,16 @@ class Downloader(object):
         """
         # starting download for try_times
         for try_t in range(self.try_times):
+            #response = urllib.request.urlopen(self.url_obj.get_url(), timeout=self.timeout)
+            response = urllib.request.urlopen(self.url_obj.get_url())
+            response.depth = self.url_obj.get_depth()
+            return (response, 0)
             try:
-                response = urllib2.urlopen(self.url_obj.get_url(), timeout=self.timeout)
+                response = urllib.request.urlopen(self.url_obj.get_url(), timeout=self.timeout)
                 response.depth = self.url_obj.get_depth()
                 return (response, 0)
 
-            except urllib2.URLError as e:
+            except urllib.error.URLError as e:
                 if try_t == self.try_times - 1:
                     error_info = \
                         '* Downloading failed : %s-%s' % (self.url_obj.get_url(), e)
@@ -55,7 +61,7 @@ class Downloader(object):
                     error_info = \
                         '* Downloading failed : %s-%s' % (self.url_obj.get_url(), e)
 
-            except urllib2.HTTPError as e:
+            except urllib.error.HTTPError as e:
                 if try_t == self.try_times - 1:
                     error_info = \
                         '* Downloading failed : %s-%S' % (self.url_obj.get_url(), e)

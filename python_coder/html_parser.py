@@ -11,7 +11,8 @@ File: html_parser.py
 Author: mijianhong(mijianhong@baidu.com)
 Date: 2016/07/09 10:37:33
 """
-import urlparse
+# import urlparse
+import urllib.parse
 import logging
 
 import bs4
@@ -43,10 +44,11 @@ class HtmlParser(object):
         if not self.enc_to_utf8():
             return extract_url_list
 
-        host_name = urlparse.urlparse(self.url).netloc
+        host_name = urllib.parse.urlparse(self.url).netloc
         soup = bs4.BeautifulSoup(self.content, 'html5lib')
+        # soup = bs4.BeautifulSoup(self.content, 'html.parser')
 
-        for tag, attr in self.link_tag_dict.iteritems():
+        for tag, attr in self.link_tag_dict.items():
             all_found_tags = soup.find_all(tag)
             for found_tag in all_found_tags:
                 if found_tag.has_attr(attr):
@@ -56,7 +58,7 @@ class HtmlParser(object):
                         continue
 
                     if not (extract_url.startswith('http:') or extract_url.startswith('https:')):
-                        extract_url = urlparse.urljoin(self.url, extract_url)
+                        extract_url = urllib.parse.urljoin(self.url, extract_url)
 
                     extract_url_list.append(extract_url)
 
@@ -69,7 +71,8 @@ class HtmlParser(object):
         Returns:
             encode_name / None :能检测出来返回编码名字，否则返回None 
         """
-        if isinstance(self.content, unicode):
+        # if isinstance(self.content, unicode):
+        if isinstance(self.content, str):
             return 'unicode'
 
         try:

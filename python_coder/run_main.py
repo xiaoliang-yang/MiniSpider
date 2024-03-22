@@ -5,7 +5,6 @@
 # Copyright (c) 2016 Baidu.com, Inc. All Rights Reserved
 #
 ########################################################################
-
 """
 File: run_main.py
 功能：启动mini_spider
@@ -25,7 +24,7 @@ if __name__ == '__main__':
     主程序,程序入口
     """
 
-    log.init_log('./log/mini_spider')
+    log.init_log('./log/mini_spider', level=logging.DEBUG)
     logging.info('%-35s' % ' * miniSpider is starting ... ')
     red_on_cyan = lambda x: termcolor.colored(x, 'red', 'on_cyan')
     # *********************************  start  ***********************
@@ -46,7 +45,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # create an instance of miniSpider and start crawling
-    print red_on_cyan('* MiniSpider is Staring ... ')
+    print(red_on_cyan('* MiniSpider is Staring ... '))
     mini_spider_inst = mini_spider.MiniSpider(args.CONF_PATH)
     init_success = mini_spider_inst.initialize()
     if init_success:
@@ -55,4 +54,4 @@ if __name__ == '__main__':
 
     # *********************************** end  **************************
     logging.info('%-35s' % ' * miniSpider is ending ...')
-    print red_on_cyan('* MiniSpider is ending ... ')
+    print(red_on_cyan('* MiniSpider is ending ... '))

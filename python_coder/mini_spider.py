@@ -12,7 +12,7 @@ File: mini_spider.py
 Author: mijianhong(mijianhong@baidu.com)
 Date: 2016/07/05 12:04:33
 """
-import Queue
+from queue import Queue
 import threading
 import os
 import logging
@@ -40,7 +40,7 @@ class MiniSpider(object):
         """
         Initialize variables
         """
-        self.checking_url = Queue.Queue(0)
+        self.checking_url = Queue(0)
         self.checked_url = set()
         self.error_url = set()
         self.config_file_path = config_file_path
@@ -76,41 +76,41 @@ class MiniSpider(object):
         """
         MiniSpider 创建时显示配置信息
         """
-        print termcolor.colored('* MiniSpider Configurations list as follows:', 'green')
-        print termcolor.colored('* %-25s : %s' % ('url_list_file   :',
+        print(termcolor.colored('* MiniSpider Configurations list as follows:', 'green'))
+        print(termcolor.colored('* %-25s : %s' % ('url_list_file   :',
                                                    self.url_list_file),
                                                    'green'
-                                                   )
+                                                   ))
 
-        print termcolor.colored('* %-25s : %s' % ('output_directory:',
+        print(termcolor.colored('* %-25s : %s' % ('output_directory:',
                                                    self.output_dir),
                                                    'green'
-                                                   )
+                                                   ))
 
-        print termcolor.colored('* %-25s : %s' % ('max_depth       :',
+        print(termcolor.colored('* %-25s : %s' % ('max_depth       :',
                                                   self.max_depth),
                                                   'green'
-                                                  )
+                                                  ))
 
-        print termcolor.colored('* %-25s : %s' % ('crawl_interval  :',
+        print(termcolor.colored('* %-25s : %s' % ('crawl_interval  :',
                                                   self.crawl_interval),
                                                   'green'
-                                                  )
+                                                  ))
 
-        print termcolor.colored('* %-25s : %s' % ('crawl_timeout   :',
+        print(termcolor.colored('* %-25s : %s' % ('crawl_timeout   :',
                                                   self.crawl_timeout),
                                                   'green'
-                                                  )
+                                                  ))
 
-        print termcolor.colored('* %-25s : %s' % ('target_url      :',
+        print(termcolor.colored('* %-25s : %s' % ('target_url      :',
                                                    self.target_url),
                                                    'green'
-                                                   )
+                                                   ))
 
-        print termcolor.colored('* %-25s : %s' % ('thread_count    :',
+        print(termcolor.colored('* %-25s : %s' % ('thread_count    :',
                                                   self.thread_count),
                                                   'green'
-                                                  )
+                                                  ))
 
     def get_seed_url(self):
         """
@@ -124,14 +124,15 @@ class MiniSpider(object):
             self.program_end('there is no seedfile !')
             return False
 
-        with open(self.url_list_file, 'rb') as f:
+        # with open(self.url_list_file, 'rb') as f:
+        with open(self.url_list_file, 'r') as f:
             lines = f.readlines()
 
         for line in lines:
             if line.strip() == '':
                 continue
 
-            url_obj = url_object.Url(line.strip(), 0)
+            url_obj = url_object.Url(str(line.strip()), 0)
             self.checking_url.put(url_obj)
         return True
 
@@ -145,13 +146,13 @@ class MiniSpider(object):
         Returns:
             none
         """
-        print termcolor.colored('* crawled page num : {}'.format(len(self.checked_url)), 'green')
+        print(termcolor.colored('* crawled page num : {}'.format(len(self.checked_url)), 'green'))
         logging.info('crawled  pages  num : {}'.format(len(self.checked_url)))
-        print termcolor.colored('* error page num : {}'.format(len(self.error_url)), 'green')
+        print(termcolor.colored('* error page num : {}'.format(len(self.error_url)), 'green'))
         logging.info('error page num : {}'.format(len(self.error_url)))
-        print termcolor.colored('* finish_reason  :' + info, 'green')
+        print(termcolor.colored('* finish_reason  :' + info, 'green'))
         logging.info('reason of ending :' + info)
-        print termcolor.colored('* program is ended ... ', 'green')
+        print(termcolor.colored('* program is ended ... ', 'green'))
         logging.info('program is ended ... ')
 
     def run_threads(self):
@@ -166,7 +167,7 @@ class MiniSpider(object):
         args_dict['max_depth'] = self.max_depth
         args_dict['tag_dict'] = self.tag_dict
 
-        for index in xrange(self.thread_count):
+        for index in range(self.thread_count):
             thread_name = 'thread - %d' % index
             thread = crawl_thread.CrawlerThread(thread_name,
                                                 self.process_request,
@@ -175,7 +176,7 @@ class MiniSpider(object):
 
             thread.setDaemon(True)
             thread.start()
-            print termcolor.colored(("第%s个线程开始工作") % index, 'yellow')
+            print(termcolor.colored(("第%s个线程开始工作") % index, 'yellow'))
             logging.info(("第%s个线程开始工作") % index)
 
         self.checking_url.join()
@@ -224,6 +225,7 @@ class MiniSpider(object):
                      - -1 : 表示页面下载失败
                      - 2  : depth >= max_depth 的非target - URL
         """
+        logging.debug("process url:{}".format(url_obj.get_url()))
         if self.lock.acquire():
             if flag == -1:
                 self.error_url.add(url_obj)
@@ -235,6 +237,7 @@ class MiniSpider(object):
                     next_url_obj = url_object.Url(ex_url, int(url_obj.get_depth()) + 1)
                     if not self.is_visited(next_url_obj):
                         self.checking_url.put(next_url_obj)
+                        logging.debug("append url:{}".format(next_url_obj.get_url()))
 
             elif flag == 1:
                 self.checked_url.add(url_obj)

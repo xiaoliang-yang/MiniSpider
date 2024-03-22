@@ -59,15 +59,19 @@ class CrawlerThread(threading.Thread):
                          threading.currentThread().getName() + str(url_obj.get_depth()))
 
             if self.is_target_url(url_obj.get_url()):
+                logging.info('get url:{}'.format(url_obj.get_url()))
                 flag = -1
                 if self.save_target(url_obj.get_url()):
                     flag = 1
                 self.process_response(url_obj, flag)
                 continue
+            else:
+                logging.info('skip url:{}'.format(url_obj.get_url()))
 
             if url_obj.get_depth() < self.max_depth:
                 downloader_obj = downloader.Downloader(url_obj, self.crawl_timeout)
                 response, flag = downloader_obj.download() #flag = 0 or -1
+                logging.info('get flag: {} url:{}'.format(flag, url_obj.get_url()))
 
                 if flag == -1: # download failed
                     self.process_response(url_obj, flag)
@@ -78,7 +82,7 @@ class CrawlerThread(threading.Thread):
                     url = url_obj.get_url()
                     soup = html_parser.HtmlParser(content, self.tag_dict, url)
                     extract_url_list = soup.extract_url()
-
+                    #logging.debug(extract_url_list)
                     self.process_response(url_obj, flag, extract_url_list)
             else:
                 flag = 2  # depth > max_depth 的正常URL
@@ -94,7 +98,7 @@ class CrawlerThread(threading.Thread):
         Returns:
             True/False : 符合返回True 否则返回False
         """
-        found_aim =self.url_pattern.match(url)
+        found_aim =self.url_pattern.match(str(url))
         if found_aim:
             return True
         return False
@@ -112,12 +116,12 @@ class CrawlerThread(threading.Thread):
         if not os.path.isdir(self.output_dir):
             os.mkdir(self.output_dir)
 
-        file_name = urllib.quote_plus(url)
+        file_name = urllib.parse.quote_plus(url)
         if len(file_name) > 127:
             file_name = file_name[-127:]
         target_path = "{}/{}".format(self.output_dir, file_name)
         try:
-            urllib.urlretrieve(url, target_path)
+            urllib.request.urlretrieve(url, target_path)
             return True
         except IOError as e:
             logging.warn(' * Save target Faild: %s - %s' % (url, e))
